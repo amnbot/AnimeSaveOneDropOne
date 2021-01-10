@@ -1,0 +1,145 @@
+﻿@page "/"
+
+@if (!isPlaying)
+{
+    <div class="containerPlayButton">
+        <div class="centeredPlayButton">
+            <button class="playButton" @onclick="LoadAnime">PLAY!</button>
+            <p style="font-family: 'TYPOGRAPH PRO'; text-align: center;">@loadingText</p>
+        </div>       
+    </div>
+}
+else
+{
+    <h1 class="appTitle">SAVE ONE/DROP ONE - ANIME EDITION!</h1>
+
+    <figure id="images" class="characters">
+        <a href="">
+            <img @onclick="PlayGame" src="@charOneImg" class="myimg" />
+            <figcaption class="charText">Name: @charOneName</figcaption>
+            <figcaption class="animeText">Anime: @animeOneName</figcaption>
+        </a>
+        <a href="">
+            <img @onclick="PlayGame" src="@charTwoImg" class="myimg" />
+            <figcaption class="charText">Name: @charTwoName</figcaption>
+            <figcaption class="animeText">Anime: @animeTwoName</figcaption>
+        </a>
+    </figure>
+}
+
+
+
+@code
+{
+    private bool isPlaying = false;
+    private string loadingText = "";
+
+    private List<AnimeTopEntry> aniList = new List<AnimeTopEntry>();
+
+    public string charOneImg;
+    public string charOneName;
+    public string animeOneName;
+
+    public string charTwoImg;
+    public string charTwoName;
+    public string animeTwoName;
+
+    private async Task LoadAnime(MouseEventArgs e)
+    {
+        IJikan jikan = new Jikan();
+        /*var anime = await jikan.GetCharacter(2);
+        charOneImg = anime.ImageURL;
+        charOneName = anime.Name;
+        animeOneName = anime.NameKanji;*/
+        loadingText = "Loading... Please wait";
+        for (int i = 1; i <= 15; i++)
+        {
+            var animes = await jikan.GetAnimeTop(i);
+            foreach (var anime in animes.Top)
+            {
+                if(anime.Type == "TV")
+                {
+                    if(anime.Title.Contains("Season") || anime.Title.Contains("Zoku") || anime.Title.Contains("Part"))
+                    {
+                        Console.WriteLine("Anime has been omitted because it is a sequel to another anime.");
+                    }
+                    else
+                    {
+                        aniList.Add(anime);
+                    }
+                }
+            }
+        }
+
+        isPlaying = true;
+
+        await PlayGame(e);
+    }
+
+    private async Task PlayGame(MouseEventArgs e)
+    {
+        IJikan jikan = new Jikan();
+        Task[] tasks = new Task[2];
+        Random r = new Random();
+
+        int indexOne = r.Next(0, aniList.Count);
+        int indexTwo = r.Next(0, aniList.Count);
+
+        tasks[0] = GetFirstChar(indexOne, jikan, r);
+        tasks[1] = GetScndChar(indexTwo, jikan, r);
+
+        await Task.WhenAll(tasks);
+    }
+
+    private async Task GetFirstChar(int index, IJikan jikan, Random r)
+    {
+        var anime = aniList[index];
+
+        var charStaff = await jikan.GetAnimeCharactersStaff(anime.MalId);
+        List<CharacterEntry> charList = new List<CharacterEntry>();
+
+        foreach (var character in charStaff.Characters)
+        {
+            if (character.ImageURL.Contains("questionmark"))
+            {
+                Console.WriteLine("Character has no image...");
+            }
+            else
+            {
+                charList.Add(character);
+            }
+        }
+
+        var rCharIndex = r.Next(0, charList.Count);
+        var charOne = charList[rCharIndex];
+        charOneImg = charOne.ImageURL;
+        charOneName = charOne.Name;
+        animeOneName = anime.Title;
+    }
+
+    private async Task GetScndChar(int index, IJikan jikan, Random r)
+    {
+        var anime = aniList[index];
+
+        var charStaff = await jikan.GetAnimeCharactersStaff(anime.MalId);
+        List<CharacterEntry> charList = new List<CharacterEntry>();
+
+        foreach (var character in charStaff.Characters)
+        {
+            if (character.ImageURL.Contains("questionmark"))
+            {
+                Console.WriteLine("Character has no image...");
+            }
+            else
+            {
+                charList.Add(character);
+            }
+        }
+
+        var rCharIndex = r.Next(0, charList.Count);
+        var charTwo = charList[rCharIndex];
+        charTwoImg = charTwo.ImageURL;
+        charTwoName = charTwo.Name;
+        animeTwoName = anime.Title;
+    }
+}

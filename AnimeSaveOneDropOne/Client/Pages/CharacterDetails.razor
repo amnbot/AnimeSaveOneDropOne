@@ -1,0 +1,37 @@
+﻿@page "/character/{id:int}"
+@inject ICharacterService CharacterService
+
+<h3 style="font-family: Heavitas">@animeCharacter.Name</h3>
+
+<div class="media-big" style="background-color:transparent">
+    <div class="media-img-big-wrapper mr-2">
+        <img class="media-img-big" src="@animeCharacter.ImageUrl" alt="@animeCharacter.Name" />
+    </div>
+    <div class="media-body">
+        <h2 class="mb-0">@animeCharacter.Name</h2>
+        @if(animeCharacter.Rank < animeCharacter.PreviousRank)
+        {
+            <h6 class="previous-rank">Previous: @animeCharacter.PreviousRank</h6>
+        }
+        <h4 class="rank">
+            Rank: @animeCharacter.Rank (@animeCharacter.Points POINTS)
+        </h4>
+    </div>
+</div>
+
+@code {
+    private AnimeCharacter animeCharacter = new AnimeCharacter();
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //if(CharacterService.AnimeCharacters == null || CharacterService.AnimeCharacters.Count == 0)
+        //{
+        //    CharacterService.LoadAnimeCharacters();
+        //}
+
+        animeCharacter = await CharacterService.GetAnimeCharacter(Id);
+    }
+}

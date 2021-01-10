@@ -1,0 +1,40 @@
+﻿@inherits LayoutComponentBase
+@inject IAnimeService AnimeService
+<!--<div class="sidebar">
+    <NavMenu />
+</div>-->
+<div class="page">
+    <ul class="navbarpages">
+        <li class="navbaritems">
+            <NavLink href="">Play</NavLink>
+        </li>
+        <li class="navbaritems">
+            <NavLink href="rankings">Rankings</NavLink>
+        </li>
+        <!--
+        foreach (var anime in AnimeService.Animes)
+    {
+        <li class="navbaritems">
+            <NavLink href="anime.Url">anime.Name</NavLink>
+        </li>
+    }
+    -->
+        <li class="navbaritems">
+            <NavLink href="characters">Characters</NavLink>
+        </li>
+    </ul>
+    <div class="main">
+        <div class="content px-4">
+            @Body
+        </div>
+    </div>
+</div>
+
+@code
+{      
+    protected override void OnInitialized()
+    {
+        AnimeService.LoadAnimes();
+    }
+}
+
