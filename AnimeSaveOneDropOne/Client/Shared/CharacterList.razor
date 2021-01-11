@@ -4,29 +4,38 @@
 @page "/characters"
 
 <ul class="list-unstyled" style="background-color: transparent; display: inline;">
-    @foreach (var animeCharacter in CharacterService.AnimeCharacters)
+    @if (CharacterService.AnimeCharacters != null)
     {
-        <li class="media my-3" style="border-radius: 10px;">
-            <div class="media-img-wrapper mr-2">
-                <a href="/character/@animeCharacter.MalId">
-                    <img class="media-img" src="@animeCharacter.ImageUrl" alt="@animeCharacter.Name" />
-                </a>
-            </div>
-            <div class="media-body">
-                <a href="/character/@animeCharacter.MalId">
-                    <h4 class="mb-0">@animeCharacter.Name</h4>
-                </a>
-                @if(animeCharacter.Rank < animeCharacter.PreviousRank)
-                {
-                    <h6 class="previous-rank">Previous: @animeCharacter.PreviousRank</h6>
-                }
-                <h5 class="rank">Rank: @animeCharacter.Rank (@animeCharacter.Points PTS)</h5>
-            </div>
-        </li>
+        var sortedList = CharacterService.AnimeCharacters.OrderBy(c => c.Points).ToList();
+
+        sortedList.Reverse();
+        int pos = 1;
+
+        foreach (var animeCharacter in sortedList)
+        {
+            if (pos <= 100)
+            {
+                <li class="media my-3" style="border-radius: 10px; display: flex;">
+                    <div class="media-img-wrapper mr-2">
+                        <a href="/character/@animeCharacter.MalId">
+                            <img class="media-img" src="@animeCharacter.ImageUrl" alt="@animeCharacter.Name" />
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <a href="/character/@animeCharacter.MalId">
+                            <h4 class="mb-0">@animeCharacter.Name</h4>
+                        </a>
+                        <h3 class="rank">Rank: @pos (@animeCharacter.Points PTS)</h3>
+                    </div>
+                </li>
+            }
+
+            pos++;
+        }
     }
 </ul>
 
-<div class="my-3">
+@*<div class="my-3">
     @foreach(var anime in AnimeService.Animes)
     {
         <li class="media my-3" style="border-radius: 10px;">
@@ -35,7 +44,7 @@
             </div>
         </li>
     }
-</div>
+</div>*@
 
 @code {
     [Parameter]
@@ -45,5 +54,20 @@
     {
         await AnimeService.LoadAnimes();
         await CharacterService.LoadAnimeCharacters();
+
+        var sortedList = CharacterService.AnimeCharacters.OrderBy(c => c.Points).ToList();
+
+        sortedList.Reverse();
+
+        int pos = 1;
+        foreach(var animeCharacter in sortedList)
+        {
+            animeCharacter.PreviousRank = animeCharacter.Rank;
+            animeCharacter.Rank = pos;
+
+            await CharacterService.UpdateAnimeCharacter(animeCharacter);
+
+            pos++;
+        }
     }
 }

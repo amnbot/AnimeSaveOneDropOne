@@ -1,4 +1,6 @@
-﻿@page "/"
+﻿@inject ICharacterService CharacterService
+
+@page "/"
 
 @if (!isPlaying)
 {
@@ -15,12 +17,12 @@ else
 
     <figure id="images" class="characters">
         <a href="">
-            <img @onclick="PlayGame" src="@charOneImg" class="myimg" />
+            <img @onclick="CharOneWin" src="@charOneImg" class="myimg" />
             <figcaption class="charText">Name: @charOneName</figcaption>
             <figcaption class="animeText">Anime: @animeOneName</figcaption>
         </a>
         <a href="">
-            <img @onclick="PlayGame" src="@charTwoImg" class="myimg" />
+            <img @onclick="CharTwoWin" src="@charTwoImg" class="myimg" />
             <figcaption class="charText">Name: @charTwoName</figcaption>
             <figcaption class="animeText">Anime: @animeTwoName</figcaption>
         </a>
@@ -31,6 +33,11 @@ else
 
 @code
 {
+    protected override async Task OnInitializedAsync()
+    {
+        await CharacterService.LoadAnimeCharacters();
+    }
+
     private bool isPlaying = false;
     private string loadingText = "";
 
@@ -44,6 +51,12 @@ else
     public string charTwoName;
     public string animeTwoName;
 
+    public CharacterEntry globCharOne;
+    public CharacterEntry globCharTwo;
+
+    public AnimeTopEntry globAniOne;
+    public AnimeTopEntry globAniTwo;
+
     private async Task LoadAnime(MouseEventArgs e)
     {
         IJikan jikan = new Jikan();
@@ -52,14 +65,14 @@ else
         charOneName = anime.Name;
         animeOneName = anime.NameKanji;*/
         loadingText = "Loading... Please wait";
-        for (int i = 1; i <= 15; i++)
+        for (int i = 1; i <= 1; i++)
         {
             var animes = await jikan.GetAnimeTop(i);
             foreach (var anime in animes.Top)
             {
                 if(anime.Type == "TV")
                 {
-                    if(anime.Title.Contains("Season") || anime.Title.Contains("Zoku") || anime.Title.Contains("Part"))
+                    if(anime.Title.Contains("Season") || anime.Title.Contains("Zoku") || anime.Title.Contains("Part") || anime.Title.Contains("Enchousen") || anime.Title.Contains("Gintama'"))
                     {
                         Console.WriteLine("Anime has been omitted because it is a sequel to another anime.");
                     }
@@ -73,10 +86,54 @@ else
 
         isPlaying = true;
 
-        await PlayGame(e);
+        await PlayGame();
     }
 
-    private async Task PlayGame(MouseEventArgs e)
+    private async Task CharOneWin(MouseEventArgs e)
+    {
+        await AddPoints(globCharOne, globAniOne);
+
+        await PlayGame();
+    }
+
+    private async Task CharTwoWin(MouseEventArgs e)
+    {
+        await AddPoints(globCharTwo, globAniTwo);
+
+        await PlayGame();
+    }
+
+    private async Task AddPoints(CharacterEntry winningChar, AnimeTopEntry winningAnime)
+    {
+        var animeCharacter = new AnimeCharacter()
+        {
+            MalId = Convert.ToInt32(winningChar.MalId),
+            Name = winningChar.Name,
+            AnimeMalId = Convert.ToInt32(winningAnime.MalId),
+            ImageUrl = winningChar.ImageURL,
+            Rank = 100,
+            PreviousRank = 100,
+        };
+
+        if(CharacterService.AnimeCharacters
+            .Contains(
+            CharacterService
+            .AnimeCharacters
+            .FirstOrDefault(c => c.MalId == animeCharacter.MalId)
+            ))
+        {
+            var myWinChar = await CharacterService.GetAnimeCharacter(animeCharacter.MalId);
+            animeCharacter.Points = myWinChar.Points + 1;
+            await CharacterService.UpdateAnimeCharacter(animeCharacter);
+        }
+        else
+        {
+            animeCharacter.Points = 1;
+            await CharacterService.CreateAnimeCharacter(animeCharacter);
+        }
+    }
+
+    private async Task PlayGame()
     {
         IJikan jikan = new Jikan();
         Task[] tasks = new Task[2];
@@ -112,6 +169,8 @@ else
 
         var rCharIndex = r.Next(0, charList.Count);
         var charOne = charList[rCharIndex];
+        globCharOne = charOne;
+        globAniOne = anime;
         charOneImg = charOne.ImageURL;
         charOneName = charOne.Name;
         animeOneName = anime.Title;
@@ -132,12 +191,14 @@ else
             }
             else
             {
-                charList.Add(character);
+                    charList.Add(character);
             }
         }
 
         var rCharIndex = r.Next(0, charList.Count);
         var charTwo = charList[rCharIndex];
+        globCharTwo = charTwo;
+        globAniTwo = anime;
         charTwoImg = charTwo.ImageURL;
         charTwoName = charTwo.Name;
         animeTwoName = anime.Title;

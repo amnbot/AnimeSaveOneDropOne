@@ -12,5 +12,9 @@ namespace AnimeSaveOneDropOne.Client.Services.CharacterService
         Task LoadAnimeCharacters();
 
         Task<AnimeCharacter> GetAnimeCharacter(int Id);
+
+        Task CreateAnimeCharacter(AnimeCharacter animeCharacter);
+
+        Task UpdateAnimeCharacter(AnimeCharacter animeCharacter);
     }
 }

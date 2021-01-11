@@ -27,5 +27,15 @@ namespace AnimeSaveOneDropOne.Client.Services.CharacterService
         {
             return await _http.GetFromJsonAsync<AnimeCharacter>($"api/Character/{Id}");
         }
+
+        public async Task CreateAnimeCharacter(AnimeCharacter animeCharacter)
+        {
+            await _http.PostAsJsonAsync("api/Character", animeCharacter);
+        }
+
+        public async Task UpdateAnimeCharacter(AnimeCharacter animeCharacter)
+        {
+            await _http.PutAsJsonAsync("api/Character", animeCharacter);
+        }
     }
 }

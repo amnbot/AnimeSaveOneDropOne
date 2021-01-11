@@ -31,5 +31,49 @@ namespace AnimeSaveOneDropOne.Server.Controllers
         {
             return Ok(await _characterService.GetAnimeCharacter(Id));
         }
+
+        [HttpPost]
+        public async Task<ActionResult<AnimeCharacter>> CreateAnimeCharacter(AnimeCharacter animeCharacter)
+        {
+            try
+            {
+                if(animeCharacter == null)
+                {
+                    return BadRequest();
+                }
+
+                var createdAnimeCharacter = await _characterService.CreateAnimeCharacter(animeCharacter);
+
+                return CreatedAtAction(nameof(GetAnimeCharacter), new { id = createdAnimeCharacter.MalId }, animeCharacter);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    "Error retrieving data from the database");
+            }
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<AnimeCharacter>> UpdateAnimeCharacter(AnimeCharacter animeCharacter)
+        {
+            return Ok(await _characterService.UpdateAnimeCharacter(animeCharacter));
+
+            /*try
+            {
+                if (animeCharacter == null)
+                {
+                    return BadRequest();
+                }
+
+                var createdAnimeCharacter = await _characterService.UpdateAnimeCharacter(animeCharacter);
+
+                return CreatedAtAction(nameof(GetAnimeCharacter), new { id = createdAnimeCharacter.MalId }, animeCharacter);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                    "Error retrieving data from the database");
+            }*/
+        }
     }
 }

@@ -1,5 +1,7 @@
-﻿using AnimeSaveOneDropOne.Server.Services.AnimeService;
+﻿using AnimeSaveOneDropOne.Server.Data;
+using AnimeSaveOneDropOne.Server.Services.AnimeService;
 using AnimeSaveOneDropOne.Shared;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,45 +12,54 @@ namespace AnimeSaveOneDropOne.Server.Services.CharacterService
     public class CharacterService : ICharacterService
     {
         private readonly IAnimeService _animeService;
+        private readonly DataContext _context;
 
-        public CharacterService(IAnimeService animeService)
+        public CharacterService(IAnimeService animeService, DataContext context)
         {
             _animeService = animeService;
+            _context = context;
+        }
+
+        public async Task<AnimeCharacter> CreateAnimeCharacter(AnimeCharacter animeCharacter)
+        {
+            var result = await _context.AnimeCharacters.AddAsync(animeCharacter);
+            await _context.SaveChangesAsync();
+
+            return result.Entity;
         }
 
         public async Task<List<AnimeCharacter>> GetAllAnimeCharacters()
         {
-            return AnimeCharacters;
+            return await _context.AnimeCharacters.ToListAsync();
         }
 
         public async Task<AnimeCharacter> GetAnimeCharacter(int Id)
         {
-            AnimeCharacter animeCharacter = AnimeCharacters.FirstOrDefault(c => c.MalId == Id);
+            AnimeCharacter animeCharacter = await _context.AnimeCharacters.FirstOrDefaultAsync(c => c.MalId == Id);
             return animeCharacter;
         }
-        public List<AnimeCharacter> AnimeCharacters { get; set; } = new List<AnimeCharacter>
-            {
-                new AnimeCharacter
-                {
-                    MalId = 1,
-                    Name = "AMN",
-                    ImageUrl = "https://fiverr-res.cloudinary.com/images/q_auto,f_auto/gigs/149470781/original/cf87ada92b21431ab6418eeae2aac47aa6502d56/draw-cool-anime-or-manga-style-characters-fan-art-or-oc.png",
-                    Points = 0,
-                    Rank = 1,
-                    PreviousRank = 2,
-                    AnimeMalId = 1
-                },
-                new AnimeCharacter
-                {
-                    MalId = 2,
-                    Name = "Naruto",
-                    ImageUrl = "https://cdn.myanimelist.net/images/characters/2/284121.jpg",
-                    Points = 0,
-                    Rank = 2,
-                    PreviousRank = 2,
-                    AnimeMalId = 1
-                }
-            };
 
+        public async Task<AnimeCharacter> UpdateAnimeCharacter(AnimeCharacter animeCharacter)
+        {
+            var result = await _context.AnimeCharacters
+                .FirstOrDefaultAsync(c => c.MalId == animeCharacter.MalId);
+
+            if(result != null)
+            {
+                result.MalId = animeCharacter.MalId;
+                result.Name = animeCharacter.Name;
+                result.ImageUrl = animeCharacter.ImageUrl;
+                result.Points = animeCharacter.Points;
+                result.Rank = animeCharacter.Rank;
+                result.PreviousRank = animeCharacter.PreviousRank;
+                result.AnimeMalId = animeCharacter.AnimeMalId;
+
+                await _context.SaveChangesAsync();
+
+                return result;
+            }
+
+            return null;
+        }
     }
 }

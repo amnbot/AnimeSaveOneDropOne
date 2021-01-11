@@ -7,11 +7,15 @@
     <div class="media-img-big-wrapper mr-2">
         <img class="media-img-big" src="@animeCharacter.ImageUrl" alt="@animeCharacter.Name" />
     </div>
-    <div class="media-body">
-        <h2 class="mb-0">@animeCharacter.Name</h2>
-        @if(animeCharacter.Rank < animeCharacter.PreviousRank)
+    <div class="media-body my-3">
+        <h2 class="mb-0" style="text-align:center">@animeCharacter.Name</h2>
+        @if (animeCharacter.Rank < animeCharacter.PreviousRank)
         {
             <h6 class="previous-rank">Previous: @animeCharacter.PreviousRank</h6>
+        }
+        else if (animeCharacter.Rank > animeCharacter.PreviousRank)
+        {
+            <h6 class="previous-rank" style="color: indianred">Previous: @animeCharacter.PreviousRank</h6>
         }
         <h4 class="rank">
             Rank: @animeCharacter.Rank (@animeCharacter.Points POINTS)

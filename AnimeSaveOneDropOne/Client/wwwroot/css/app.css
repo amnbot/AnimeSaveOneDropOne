@@ -60,7 +60,7 @@ ul{
     background-color: transparent;
 }
 
-    .navbaritems:hover {
+    .navbaritems:hover{
         background-color: black;
     }
 
@@ -149,6 +149,7 @@ ul{
 .media-body{
     text-align: center;
     margin:auto;
+    display: inline;
 }
 
 .previous-rank{
@@ -168,7 +169,7 @@ ul{
 }
 
 .media-img-big {
-    height: 300px;
+    height: 400px;
     width: 400px;
     border-radius: 12px;
     margin: 15px;
@@ -187,14 +188,15 @@ ul{
 }
 
 .media-img-big-wrapper {
-    width: auto;
+    width: 400px;
     height: 400px;
     text-align: center;
+    margin-bottom: 25px;
 }
 
 .media{
     height: 200px;
-    width: 400px;
+    width: 415px;
     background-color:transparent;
     transition: transform 0.3s;
     margin: auto;
@@ -256,6 +258,22 @@ a, .btn-link {
 
 .validation-message {
     color: red;
+}
+
+.loader{
+    border: 16px solid lightgray;
+    border-top: 16px solid black;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    text-align: center;
+    margin: auto;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin{
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg)};
 }
 
 #blazor-error-ui {

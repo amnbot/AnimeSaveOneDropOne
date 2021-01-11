@@ -11,5 +11,9 @@ namespace AnimeSaveOneDropOne.Server.Services.CharacterService
         Task<List<AnimeCharacter>> GetAllAnimeCharacters();
 
         Task<AnimeCharacter> GetAnimeCharacter(int MalId);
+
+        Task<AnimeCharacter> CreateAnimeCharacter(AnimeCharacter animeCharacter);
+
+        Task<AnimeCharacter> UpdateAnimeCharacter(AnimeCharacter animeCharacter);
     }
 }
