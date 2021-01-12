@@ -124,6 +124,8 @@ else
         {
             var myWinChar = await CharacterService.GetAnimeCharacter(animeCharacter.MalId);
             animeCharacter.Points = myWinChar.Points + 1;
+            animeCharacter.Rank = myWinChar.Rank;
+            animeCharacter.PreviousRank = myWinChar.PreviousRank;
             await CharacterService.UpdateAnimeCharacter(animeCharacter);
         }
         else

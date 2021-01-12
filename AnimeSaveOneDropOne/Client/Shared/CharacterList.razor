@@ -28,6 +28,11 @@
                         <h3 class="rank">Rank: @pos (@animeCharacter.Points PTS)</h3>
                     </div>
                 </li>
+
+                animeCharacter.PreviousRank = animeCharacter.Rank;
+                animeCharacter.Rank = pos;
+
+                CharacterService.UpdateAnimeCharacter(animeCharacter);
             }
 
             pos++;
@@ -54,20 +59,5 @@
     {
         await AnimeService.LoadAnimes();
         await CharacterService.LoadAnimeCharacters();
-
-        var sortedList = CharacterService.AnimeCharacters.OrderBy(c => c.Points).ToList();
-
-        sortedList.Reverse();
-
-        int pos = 1;
-        foreach(var animeCharacter in sortedList)
-        {
-            animeCharacter.PreviousRank = animeCharacter.Rank;
-            animeCharacter.Rank = pos;
-
-            await CharacterService.UpdateAnimeCharacter(animeCharacter);
-
-            pos++;
-        }
     }
 }

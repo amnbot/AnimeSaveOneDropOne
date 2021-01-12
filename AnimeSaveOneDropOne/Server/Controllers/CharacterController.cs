@@ -1,5 +1,6 @@
 ﻿using AnimeSaveOneDropOne.Server.Services.CharacterService;
 using AnimeSaveOneDropOne.Shared;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
